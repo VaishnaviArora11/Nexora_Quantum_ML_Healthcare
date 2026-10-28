@@ -1,0 +1,14 @@
+/* ---------- Papers ---------- */
+const PAPERS=[['Variational quantum classifiers for early sepsis prediction','Quantum ML','2025'],['Quantum-kernel methods in molecular property prediction','Drug discovery','2025'],['mRNA vaccine platforms for emerging respiratory viruses','Virology','2026'],['Federated learning for multi-centre diabetes risk models','Digital health','2024'],['VQE for protein–ligand binding energy estimation','Quantum chemistry','2025']];
+function papersBase(){const mine=user.papers||[];return`<div class="card"><h2>Research papers</h2><input id="ps" placeholder="Search papers…" oninput="filt()" style="margin:8px 0"><div id="pl"></div></div>
+<div class="card"><h3>Add to the research interface</h3><label>Title</label><input id="pt"><label>Topic</label><input id="pc"><label>Abstract</label><textarea id="pa" rows="3"></textarea><button class="btn" onclick="addPaper()">Submit paper</button></div>`}
+function filt(){const q=(($('#ps')||{}).value||'').toLowerCase(),all=[...PAPERS,...(user.papers||[])].filter(p=>(p[0]+p[1]).toLowerCase().includes(q));
+ $('#pl').innerHTML=all.map(p=>`<div class="row" style="padding:8px 0;border-bottom:1px solid var(--bd)"><div><b>${esc(p[0])}</b><div class="mu">${esc(p[2])}</div></div><span class="tag">${esc(p[1])}</span></div>`).join('')||'<p class="mu">No matches.</p>'}
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function addPaper(){const t=$('#pt').value.trim();if(!t)return;user.papers.push([t,$('#pc').value||'General','You']);save();render()}
+
+/* ---------- Wallet, learn, doctors ---------- */
+const QZ=[['Normal resting adult heart rate is…',['60–100 bpm','120–160 bpm','20–40 bpm'],0],['Antibiotics work against…',['Viruses','Bacteria','Both'],1],['A key way to prevent type 2 diabetes is…',['Regular activity and balanced diet','Avoiding all water','Sleeping less'],0]];
+function walletView(){const p=user.pts||0,lv=p>=100?'Expert':p>=50?'Informed':'Beginner';return`<div class="card"><div class="row"><div><h2>Health impact wallet</h2><div class="mu">Literacy level: <b>${lv}</b></div></div><div style="font-size:30px;font-weight:800;color:var(--ac)">${p} pts</div></div><div class="meter" style="margin-top:8px"><i style="width:${Math.min(100,p)}%"></i></div></div>
+<div class="card"><h3>Health literacy check (+10 pts per correct answer)</h3>${QZ.map((q,i)=>`<label>${q[0]}</label><select id="q${i}"><option value="-1">Choose…</option>${q[1].map((o,j)=>`<option value="${j}">${o}</option>`).join('')}</select>`).join('')}<button class="btn" onclick="grade()">Submit</button><div id="qo"></div></div>`}
+function grade(){let c=0;QZ.forEach((q,i)=>{if(+$('#q'+i).value===q[2])c++});user.pts+=c*10;save();$('#qo').innerHTML=`<p class="ok">${c}/${QZ.length} correct – +${c*10} pts earned.</p>`;setTimeout(render,1200)}
